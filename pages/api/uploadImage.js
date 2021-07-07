@@ -12,7 +12,7 @@ const ncOptions = {
   onNoMatch,
 }
 
-const multerStorage = multer.diskStorage({
+const storage = multer.diskStorage({
   // first param of cb's is error
   destination: (req, file, cb) => {
     return cb(null, './public/uploads')
@@ -23,7 +23,7 @@ const multerStorage = multer.diskStorage({
   },
 })
 
-const multerFilter = (req, file, cb) => {
+const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true)
   } else {
@@ -31,24 +31,21 @@ const multerFilter = (req, file, cb) => {
   }
 }
 
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-})
+const multerOptions = {
+  storage,
+  fileFilter,
+}
+
+const uploadMiddleware = multer(multerOptions).single('image')
 
 const handler = nc(ncOptions)
-
-const uploadMiddleware = upload.single('image')
-
-handler.use(uploadMiddleware)
-
-handler.post((req, res) => {
-  console.log(req)
-  res.status(200).json({
-    success: true,
-    message: 'it worked',
+  .use(uploadMiddleware)
+  .post((req, res) => {
+    res.status(200).json({
+      success: true,
+      message: 'it worked',
+    })
   })
-})
 
 export default handler
 
