@@ -41,9 +41,11 @@ const uploadMiddleware = multer(multerOptions).single('image')
 const handler = nc(ncOptions)
   .use(uploadMiddleware)
   .post((req, res) => {
+    const img = req.file.filename
+    const imgPath = req.file.path
     res.status(200).json({
       success: true,
-      message: 'it worked',
+      img: `http://localhost:3000/uploads/${img}`,
     })
   })
 
